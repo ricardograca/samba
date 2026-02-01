@@ -2,7 +2,7 @@
 [ -z "$DOCKER_REGISTRY" ] && echo "error please specify docker-registry DOCKER_REGISTRY" && exit 1
 IMG="$DOCKER_REGISTRY/samba"
 
-PLATFORM="linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
+PLATFORM="linux/amd64,linux/arm64"
 
 rm -rf variants.tar variants/ 2>/dev/null >/dev/null
 
@@ -18,8 +18,7 @@ docker buildx build -q --pull --no-cache --platform "$PLATFORM" -t "$IMG:$TAG" -
 echo "$@" | grep "release" 2>/dev/null >/dev/null && echo ">> releasing new latest" && docker buildx build -q --pull --platform "$PLATFORM" -t "$IMG:latest" --push .
 
 # make sure this is only executed in main script
-echo "$@" | grep "variant" && exit 0 
-
+echo "$@" | grep "variant" && exit 0
 
 tar cf variants.tar --exclude .git/ --exclude variants.tar .
 
