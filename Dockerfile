@@ -1,10 +1,9 @@
-FROM alpine AS wsdd2-builder
+FROM alpine:3.17.2 AS wsdd2-builder
 
 RUN apk add --no-cache make gcc libc-dev linux-headers && wget -O - https://github.com/Netgear/wsdd2/archive/refs/heads/master.tar.gz | tar zxvf - \
  && cd wsdd2-master && make
 
-FROM alpine
-# alpine:3.14
+FROM alpine:3.17.2
 
 COPY --from=wsdd2-builder /wsdd2-master/wsdd2 /usr/sbin
 
@@ -23,7 +22,7 @@ RUN apk add --no-cache runit \
 
 VOLUME ["/shares"]
 
-EXPOSE 139 445
+EXPOSE 137/udp 139 445
 
 COPY . /container/
 

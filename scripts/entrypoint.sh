@@ -65,6 +65,12 @@ if [ ! -f "$INITALIZED" ]; then
   fi
   echo '   map to guest = '"$SAMBA_CONF_MAP_TO_GUEST" >> /etc/samba/smb.conf
 
+  if [ ! -z ${NETBIOS_DISABLE+x} ]
+  then
+    echo ">> SAMBA CONFIG: \$NETBIOS_DISABLE is set - disabling nmbd"
+    echo '   disable netbios = yes' >> /etc/samba/smb.conf
+  fi
+
   ##
   # GLOBAL CONFIGURATION
   ##
@@ -118,7 +124,7 @@ if [ ! -f "$INITALIZED" ]; then
       echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | passwd "$ACCOUNT_NAME"
       echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | smbpasswd "$ACCOUNT_NAME"
     fi
-    
+
     smbpasswd -e "$ACCOUNT_NAME"
 
     # add user to groups...
@@ -213,7 +219,7 @@ if [ ! -f "$INITALIZED" ]; then
 ' >> /etc/samba/smb.conf
     fi
 
-    if echo "$VOL_PATH" | grep '%U$' 2>/dev/null >/dev/null; 
+    if echo "$VOL_PATH" | grep '%U$' 2>/dev/null >/dev/null;
     then
       VOL_PATH_BASE=$(echo "$VOL_PATH" | sed 's,/%U$,,g')
       echo "  >> multiuser volume - $VOL_PATH"
@@ -236,6 +242,8 @@ if [ ! -f "$INITALIZED" ]; then
   [ ! -z ${WSDD2_DISABLE+x} ] && echo ">> WSDD2 - DISABLED" && rm -rf /container/config/runit/wsdd2
 
   [ ! -z ${AVAHI_DISABLE+x} ] && echo ">> AVAHI - DISABLED" && rm -rf /container/config/runit/avahi
+
+  [ ! -z ${NETBIOS_DISABLE+x} ] && echo ">> NETBIOS - DISABLED" && rm -rf /container/config/runit/nmbd
 
   if [ -z ${AVAHI_DISABLE+x} ] && [ ! -f "/external/avahi/not-mounted" ]
   then
